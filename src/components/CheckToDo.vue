@@ -1,7 +1,7 @@
 <script setup>
 import { watchEffect, ref, reactive, unref, computed, onMounted, watch } from 'vue';
 import { ElTable, ElTableColumn, ElIcon, ElButton, ElRow, ElCol, ElInput, ElSwitch, ElCard, ElEmpty, ElPopconfirm, ElDrawer } from 'element-plus'
-import { Setting } from '@element-plus/icons-vue'
+import { Setting, DeleteFilled } from '@element-plus/icons-vue'
 
 //调档
 const checkData = ref()//清单表
@@ -152,22 +152,62 @@ const clear = () => {
   localStorage.removeItem('checkToDo')
 
 }
+//适配移动端的页面旋转
+const checkToDo = ref()//获取组件实例
+const isPhone = ref((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|WOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)))
+onMounted(() => {//如果是手机端，重新渲染样式
+  if (isPhone.value) {
+    checkToDo.value.style.transform = 'translate(-50%, -50%) rotate(90deg) '
+    checkToDo.value.style.width = `${window.getComputedStyle(document.querySelector('#app')).height.replace('px', '') - 40}px`
+    checkToDo.value.style.height = `${window.getComputedStyle(document.querySelector('#app')).width.replace('px', '') - 40}px`
+    document.querySelector('.checkToDo .header').style = "height:1rem"
+    document.querySelector('.checkToDo .header .el-col').style = 'height:1rem;font-size:.55rem'
+    document.querySelector('.checkToDo .header .el-col img').style = 'height:.8rem;margin:0 .6rem'
+    document.querySelector('.checkToDo .header .el-col .el-card').style = 'width:100%;text-align: center;font-size:.2rem;line-height:.2rem;background-color: bisque;margin-top:-10px;color:brown;white-space:pre-line'
+    document.querySelector('.checkToDo .header .el-col .el-input').style = 'height:20px;font-size:12px;width:calc(100% - 80px)'
+    document.querySelector('.checkToDo .header .el-col .el-button').style = 'margin-left:5px;width:40px;font-size:12px;height:40px'
+    document.querySelector('.checkToDo .main .el-table .el-table__header-wrapper').style = 'font-size:11px;height:40px'
+    document.querySelector('.checkToDo .main .report').style = 'width: 40px; height: 40px;margin-right: -30px;margin-bottom: -30px;padding: 14px 6px 0 8px;font-size: 12px;'
+    document.querySelector('.checkToDo .main .reportDrawer .el-drawer__title').style = 'font-size: 15px;'
+    document.querySelector('.checkToDo .main .reportDrawer').style = 'font-size: 12px;'
+
+
+    //重新计算一下表格高度
+    let paddingTop = 0
+    let paddingBottom = 0
+    if (window.getComputedStyle(tableContainerRef.value).boxSizing == 'border-box') {
+      paddingTop = window.getComputedStyle(tableContainerRef.value).paddingTop ? window.getComputedStyle(tableContainerRef.value).paddingTop.replace('px', '') : 0
+      paddingBottom = window.getComputedStyle(tableContainerRef.value).paddingBottom ? window.getComputedStyle(tableContainerRef.value).paddingBottom.replace('px', '') : 0
+    }
+    currentHeight.value = `${window.getComputedStyle(tableContainerRef.value).height.replace('px', '') - paddingTop - paddingBottom}px`
+    console.log(window.getComputedStyle(tableContainerRef.value).height, paddingTop, paddingBottom, currentHeight.value)
+  }
+})
+const popperShow = () => {
+  if (isPhone.value) {
+    setTimeout(() => {
+      document.querySelector('.el-popper>div').style = 'transform:rotate(90deg) translate(20px,0)'
+    }, 10)
+
+  }
+}
+
 
 </script>
 
 <template>
-  <div class="checkToDo">
+  <div class="checkToDo" ref="checkToDo">
     <!-- 页面头部 -->
     <header class="header">
       <el-row style="height:100%">
         <el-col :span="9"
-          style="height:100%;font-size:30px;line-height:100%;font-weight: 800;text-decoration: underline;overflow: hidden;">
+          style="height:100%;font-size:.29rem;font-weight: 800;text-decoration: underline;overflow: hidden;text-align: center;">
           <img src="https://socialbeta.oss-cn-hangzhou.aliyuncs.com/avatar/5659-1460605047.png"
-            style="height:60px;vertical-align: middle;margin-right: 20px;" />每日打卡记录
+            style="height:.6rem;vertical-align: middle;margin-right: 20px;" />每日打卡记录
         </el-col>
         <el-col :span="5">
           <el-card shadow="always"
-            style="width:100%;text-align: center;font-size:20px;line-height:20px;background-color: bisque;margin-top:-10px;color:brown;white-space:pre-line">
+            style="width:100%;text-align: center;font-size:.2rem;line-height:20px;background-color: bisque;margin-top:-10px;color:brown;white-space:pre-line">
             {{ today }}
           </el-card>
         </el-col>
@@ -181,10 +221,11 @@ const clear = () => {
     <!-- 主体区域 -->
     <main class="main" ref="tableContainerRef">
       <!-- 表格 -->
-      <el-table ref="multipleTableRef" :data="checkData" style="width: 100%" :height="currentHeight"
+      <el-table ref="multipleTableRef" :data="checkData" style="width: 100%;overflow: hidden;" :height="currentHeight"
         :max-height="currentHeight" border row-key="id">
-        <el-table-column prop="text" :label="`${month}月打卡清单`" width="150px" fixed />
-        <el-table-column v-for="num in total" :key="num" :prop="`day${num}`" :label="`${num}日`" width="30px">
+        <el-table-column prop="text" :label="`${month}月打卡清单`" :width="isPhone ? '100px' : '150px'" fixed />
+        <el-table-column v-for="num in total" :key="num" :prop="`day${num}`" :label="num.toString()"
+          :width="isPhone ? '25px' : '30px'">
           <template #default="scope">
             <el-switch v-model="scope.row[`day${num}`]"
               style="--el-switch-on-color: #13ce66; --el-switch-off-color: gray;transform: rotate(90deg);"
@@ -193,7 +234,7 @@ const clear = () => {
           </template>
         </el-table-column>
         <el-table-column v-if="ifOperate" type="selection" width="30px" reserve-selection fixed="right" />
-        <el-table-column label="批量操作" min-width="150px" fixed="right">
+        <el-table-column label="批量操作" :min-width="isPhone ? '130px' : '150px'" fixed="right">
           <template #header>
             <span @click="multiOperate" style="cursor:pointer;color:brown">{{ ifOperate ?
               '删除所选/取消批量操作' : '点击此处可批量操作' }}</span>
@@ -202,7 +243,8 @@ const clear = () => {
             <el-popconfirm title="确定删除这条事项吗?" confirm-button-text="确认删除" cancel-button-text="不了"
               @confirm="deleteList(scope)">
               <template #reference>
-                <el-button :disabled="ifOperate ? true : false" size="default" type="danger" plain>删除</el-button>
+                <el-button :disabled="ifOperate ? true : false" size="default" type="danger" plain
+                  @click="popperShow">删除</el-button>
               </template>
             </el-popconfirm>
           </template>
@@ -247,7 +289,7 @@ const clear = () => {
     <el-popconfirm title="需要格式化数据吗？" confirm-button-text="格式化" cancel-button-text="不了" @confirm="clear">
       <template #reference>
         <el-icon class="clear">
-          <Setting />
+          <DeleteFilled @click="popperShow" />
         </el-icon>
       </template>
     </el-popconfirm>
@@ -256,6 +298,10 @@ const clear = () => {
 
 <style lang="scss">
 .checkToDo {
+  position: absolute;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
+  transform: translate(-50%, -50%);
   box-sizing: border-box;
   width: calc(100% - 40px);
   height: calc(100% - 40px);
@@ -270,7 +316,7 @@ const clear = () => {
 
   .header {
     width: 100%;
-    height: 100px;
+    height: 90px;
 
   }
 
@@ -371,6 +417,7 @@ const clear = () => {
       padding: 14px 0 0 10px;
       cursor: pointer;
       transition: all ease .5s;
+      font-size: 20px;
 
       &:hover {
         transform: scale(1.2)
@@ -381,7 +428,7 @@ const clear = () => {
 
 //报表抽屉
 .reportDrawer {
-  width: 1136px;
+  width: 15.1467rem;
   box-sizing: border-box;
   padding-bottom: 28px;
   overflow-y: scroll;
@@ -393,7 +440,7 @@ const clear = () => {
   }
 
   .el-drawer__title {
-    font-size: 24px;
+    font-size: .2rem;
     text-decoration: underline;
   }
 
@@ -412,14 +459,20 @@ const clear = () => {
 //右上角格式化按钮
 .clear {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0px;
+  left: 0px;
   font-size: 25px;
   cursor: pointer;
   transition: all ease .2s;
+  transform: rotate(5deg);
 
   &:hover {
     font-size: 30px;
   }
+}
+
+//气泡框
+div.el-popper {
+  height: 150px;
 }
 </style>

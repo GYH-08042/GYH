@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
+    "amfe-flexible": "^2.2.1",
     "element-plus": "^2.3.0",
     "unplugin-element-plus": "^0.7.0",
     "vue": "^3.2.45"

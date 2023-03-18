@@ -6,11 +6,16 @@ import CheckToDo from './components/CheckToDo.vue'
   <CheckToDo />
 </template>
 
-<style scoped>
-body {
-  box-sizing: border-box;
+<style>
+html,
+body,
+#app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
   width: 100vw;
   height: 100vh;
-  padding: 20px;
 }
 </style>
