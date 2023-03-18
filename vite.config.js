@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import ElementPlus from 'unplugin-element-plus/vite'//手动导入elementplus
 
 export default defineConfig({
-  base: './',
+  base: '/GYH-checkToDo/',
   plugins: [
     vue(),
     ElementPlus()
