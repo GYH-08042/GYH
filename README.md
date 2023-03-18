@@ -1,7 +1,12 @@
-# Vue 3 + Vite
+# checkToDo
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+-基于Vue3，Vite，Element-Plus
 
-## Recommended IDE Setup
+-功能：
+  -利用本地存储的每日打卡小组件，可自定义制定打卡事项，默认记录本月及上月的数据
+  -根据进入页面的时间自动匹配当月可打卡的总天数
+  -打卡时效限制：已过的日期及未到的日期不可操作
+  -主体表格支持窗口响应式变化
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+-注意事项：
+  -logo引用网络图片，仅供个人学习使用，侵删
